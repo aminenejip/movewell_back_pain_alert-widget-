@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Movewell</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=JetBrains+Mono:wght@300;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <div id="app">
+    <div id="titlebar" data-tauri-drag-region>
+      <span id="title">MOVEWELL</span>
+      <div id="window-controls">
+        <button id="minimize-btn" class="win-btn" aria-label="R\u00e9duire">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M2 6H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <button id="maximize-btn" class="win-btn" aria-label="Agrandir">
+          <svg class="max-icon" width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <rect x="1.5" y="1.5" width="9" height="9" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+          <svg class="restore-icon" width="12" height="12" viewBox="0 0 12 12" fill="none" style="display:none">
+            <rect x="2" y="4" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5" fill="rgba(0,0,0,0.8)"/>
+            <path d="M4 4V2.5C4 1.67 4.67 1 5.5 1H9.5C10.33 1 11 1.67 11 2.5V6.5C11 7.33 10.33 8 9.5 8H8" stroke="currentColor" stroke-width="1.5" fill="none"/>
+          </svg>
+        </button>
+        <button id="close-btn" class="win-btn close" aria-label="Fermer">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div id="ring-section">
+      <canvas id="ring-canvas" width="240" height="240"></canvas>
+      <div id="center-content">
+        <div id="time-display">30:00</div>
+        <div id="status-display">Travail</div>
+      </div>
+    </div>
+
+    <div id="button-row">
+      <button class="pill-btn primary" id="start-btn">Démarrer</button>
+      <button class="pill-btn" id="pause-btn" disabled>Pause</button>
+      <button class="pill-btn danger" id="stop-btn" disabled>Stop</button>
+    </div>
+
+    <div class="separator"></div>
+
+    <div id="history-label">Aujourd'hui &middot; 0 pause</div>
+
+    <div id="settings">
+      <div class="setting-row">
+        <div class="glass-card">
+          <span class="card-label">Travail</span>
+          <div class="spin-group">
+            <input type="number" id="work-spin" value="30" min="1" max="180" />
+            <span class="unit">min</span>
+          </div>
+        </div>
+        <div class="glass-card">
+          <span class="card-label">Pause</span>
+          <div class="select-wrap">
+            <select id="break-select">
+              <option value="1">1min</option>
+              <option value="2" selected>2min</option>
+              <option value="3">3min</option>
+              <option value="5">5min</option>
+              <option value="10">10min</option>
+            </select>
+            <svg class="select-arrow" width="10" height="6" viewBox="0 0 10 6" fill="none">
+              <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <div class="glass-card">
+          <label class="check-group" id="sound-toggle">
+            <span class="custom-checkbox" tabindex="0" role="checkbox" aria-checked="true"></span>
+            <span class="check-label">Son</span>
+          </label>
+        </div>
+        <div class="glass-card">
+          <div class="select-wrap">
+            <select id="sound-select">
+              <option value="">Système</option>
+            </select>
+            <svg class="select-arrow" width="10" height="6" viewBox="0 0 10 6" fill="none">
+              <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="glass-card">
+          <label class="check-group" id="topmost-toggle">
+            <span class="custom-checkbox" tabindex="0" role="checkbox" aria-checked="true"></span>
+            <span class="check-label">Au 1er plan</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div id="bottom-bar">
+      <span id="hint">clic centre &middot; &Eacute;chap ferme</span>
+      <div id="home-indicator"></div>
+    </div>
+
+    <canvas id="particles-canvas"></canvas>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

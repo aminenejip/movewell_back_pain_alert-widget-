@@ -1,0 +1,467 @@
+:root {
+  --bg: #07080C;
+  --glass: rgba(14, 18, 28, 0.7);
+  --glass-border: rgba(0, 217, 255, 0.08);
+  --glass-border-hover: rgba(0, 217, 255, 0.2);
+  --accent: #00D9FF;
+  --accent-glow: rgba(0, 217, 255, 0.25);
+  --text: #EEF0F4;
+  --text-dim: #8E909A;
+  --text-muted: #5E6068;
+  --red: #EF4444;
+  --red-glow: rgba(239, 68, 68, 0.25);
+  --orange: #FF7A3D;
+  --green: #4ADE80;
+  --btn-inactive: #12151F;
+  --btn-inactive-text: #5E6068;
+  --font: 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --radius: 14px;
+  --pill-radius: 16px;
+  --win-w: 340px;
+  --win-h: 520px;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  width: 100vw;
+  height: 100vh;
+}
+
+#app {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background:
+    radial-gradient(ellipse 120% 80% at 50% 20%, rgba(0, 217, 255, 0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 60% at 80% 80%, rgba(0, 217, 255, 0.025) 0%, transparent 50%),
+    var(--bg);
+  overflow: hidden;
+}
+
+#app::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Title Bar ── */
+#titlebar {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  flex-shrink: 0;
+}
+
+#title {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 2.4px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+#window-controls {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.win-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.win-btn:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.win-btn.close:hover {
+  color: #fff;
+  background: var(--red);
+}
+
+/* ── Ring Section ── */
+#ring-section {
+  position: relative;
+  z-index: 1;
+  width: 240px;
+  height: 240px;
+  flex-shrink: 0;
+  margin: 2px 0;
+}
+
+#ring-canvas {
+  position: absolute;
+  top: 0; left: 0;
+  width: 240px;
+  height: 240px;
+}
+
+#center-content {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+#time-display {
+  font-family: var(--font-mono);
+  font-weight: 300;
+  font-size: 52px;
+  letter-spacing: -2px;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 4px;
+  transition: color 0.4s ease;
+}
+
+#status-display {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.6px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+/* ── Button Row ── */
+#button-row {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  gap: 8px;
+  margin: 6px 0 4px;
+  flex-shrink: 0;
+}
+
+.pill-btn {
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 20px;
+  border: none;
+  border-radius: var(--pill-radius);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  background: var(--btn-inactive);
+  color: var(--btn-inactive-text);
+  letter-spacing: 0.3px;
+  position: relative;
+  overflow: hidden;
+}
+
+.pill-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--pill-radius);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.pill-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.pill-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.pill-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.pill-btn.primary {
+  background: var(--accent);
+  color: #07080C;
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+.pill-btn.primary:hover:not(:disabled) {
+  box-shadow: 0 0 24px var(--accent-glow);
+}
+
+.pill-btn.danger {
+  background: var(--red);
+  color: #07080C;
+  box-shadow: 0 0 16px var(--red-glow);
+}
+
+.pill-btn.danger:hover:not(:disabled) {
+  box-shadow: 0 0 24px var(--red-glow);
+}
+
+.pill-btn.secondary-active {
+  background: var(--accent);
+  color: #07080C;
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+/* ── Separator ── */
+.separator {
+  position: relative;
+  z-index: 5;
+  width: calc(100% - 48px);
+  height: 1px;
+  background: var(--glass-border);
+  margin: 4px 0;
+  flex-shrink: 0;
+}
+
+/* ── History ── */
+#history-label {
+  position: relative;
+  z-index: 5;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-dim);
+  letter-spacing: 0.3px;
+  margin: 2px 0;
+  flex-shrink: 0;
+}
+
+/* ── Settings ── */
+#settings {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  padding: 0 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  justify-content: center;
+}
+
+.setting-row {
+  display: flex;
+  gap: 6px;
+}
+
+.glass-card {
+  flex: 1;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 6px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: border-color 0.25s ease;
+}
+
+.glass-card:hover {
+  border-color: var(--glass-border-hover);
+}
+
+.card-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-dim);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+/* ── Spin Group ── */
+.spin-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#work-spin {
+  width: 40px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  padding: 2px 0;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+#work-spin:focus {
+  border-color: var(--accent);
+}
+
+#work-spin::-webkit-inner-spin-button {
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+.unit {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ── Select ── */
+.select-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 100px;
+}
+
+.select-wrap select {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  padding: 4px 24px 4px 10px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.select-wrap select:focus {
+  border-color: var(--accent);
+}
+
+.select-wrap select option {
+  background: #11131F;
+  color: var(--text);
+}
+
+.select-arrow {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+/* ── Custom Checkbox ── */
+.check-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.custom-checkbox {
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--glass-border);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.custom-checkbox[aria-checked="true"] {
+  border-color: var(--accent);
+  background: rgba(0, 217, 255, 0.08);
+}
+
+.custom-checkbox[aria-checked="true"]::after {
+  content: '';
+  width: 5px;
+  height: 9px;
+  border: solid var(--accent);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) translateY(-1px);
+}
+
+.custom-checkbox:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.check-label {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+/* ── Bottom Bar ── */
+#bottom-bar {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 0 10px;
+  flex-shrink: 0;
+}
+
+#hint {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+#home-indicator {
+  width: 36px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--glass-border);
+}
+
+/* ── Particles Canvas ── */
+#particles-canvas {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
