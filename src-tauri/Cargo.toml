@@ -1,20 +1,21 @@
 [package]
-name = "pause-dos-widget"
+name = "movewell"
 version = "2.0.0"
-description = "Pause Dos Widget - Desktop Break Reminder"
+description = "Movewell - Desktop Break Reminder"
 authors = ["you"]
 edition = "2021"
 
 [lib]
-name = "pause_dos_widget_lib"
+name = "movewell_lib"
 crate-type = ["lib", "cdylib", "staticlib"]
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = [] }
+tauri = { version = "2", features = ["tray-icon"] }
 tauri-plugin-notification = "2"
 tauri-plugin-shell = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+image = "0.24"

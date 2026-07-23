@@ -7,6 +7,7 @@ export class Timer {
 
   reset() {
     this.state = 'idle'; // idle | work | break | paused
+    this._prevState = 'work';
     this.elapsed = 0;
     this.sessionTotal = this.workMs;
     this.lastTick = 0;
@@ -14,12 +15,12 @@ export class Timer {
   }
 
   setWork(min) {
-    this.workMs = min * 60 * 1000;
+    this.workMs = Math.max(1, Math.min(480, min)) * 60 * 1000;
     if (this.state === 'idle') this.sessionTotal = this.workMs;
   }
 
   setBreak(min) {
-    this.breakMs = min * 60 * 1000;
+    this.breakMs = Math.max(1, Math.min(60, min)) * 60 * 1000;
   }
 
   start() {
@@ -104,9 +105,12 @@ export class Timer {
           this.onWorkEnd?.();
           this._intervalId = requestAnimationFrame(tick);
         } else {
-          this.state = 'idle';
+          this.state = 'work';
           this.elapsed = 0;
+          this.sessionTotal = this.workMs;
+          this.lastTick = performance.now();
           this.onBreakEnd?.();
+          this._intervalId = requestAnimationFrame(tick);
         }
         return;
       }

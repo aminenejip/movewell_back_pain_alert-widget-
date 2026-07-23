@@ -1,9 +1,11 @@
 import { Timer } from './timer.js';
-import { storage, BREAK_PRESETS } from './storage.js';
+import { storage } from './storage.js';
 import { audio } from './audio.js';
 
 let appWindow = null;
 let LogicalSize = null;
+let LogicalPosition = null;
+let notify = null;
 try {
   const wmod = await import('@tauri-apps/api/window');
   appWindow = wmod.getCurrentWindow();
@@ -11,6 +13,11 @@ try {
 try {
   const dpi = await import('@tauri-apps/api/dpi');
   LogicalSize = dpi.LogicalSize;
+  LogicalPosition = dpi.LogicalPosition;
+} catch {}
+try {
+  const nmod = await import('@tauri-apps/plugin-notification');
+  notify = nmod;
 } catch {}
 
 const cfg = storage.loadConfig();
@@ -41,7 +48,6 @@ const breakSelect = $('#break-select');
 const soundToggle = $('#sound-toggle');
 const soundSelect = $('#sound-select');
 const topmostToggle = $('#topmost-toggle');
-const hint = $('#hint');
 const particlesCanvas = $('#particles-canvas');
 const pCtx = particlesCanvas.getContext('2d');
 
@@ -251,11 +257,13 @@ function animateParticles() {
 
 // ── Sound files ──
 function initSounds() {
-  const files = ['police-siren-soundbible_CGYFxjf.mp3'];
-  for (const f of files) {
+  const sounds = [
+    { file: 'police-siren-soundbible_CGYFxjf.mp3', label: 'Sirène police' },
+  ];
+  for (const s of sounds) {
     const opt = document.createElement('option');
-    opt.value = f;
-    opt.textContent = f.replace(/\.\w+$/, '');
+    opt.value = s.file;
+    opt.textContent = s.label;
     soundSelect.appendChild(opt);
   }
 }
@@ -286,6 +294,9 @@ timer.onWorkEnd = () => {
   updateHistory();
   const sf = soundSelect.value;
   audio.playSound(soundToggle.querySelector('.custom-checkbox').getAttribute('aria-checked') === 'true', sf || null, 3);
+  if (notify) {
+    notify.sendNotification({ title: 'Movewell', body: "C'est l'heure de la pause !" });
+  }
   updateDisplay();
 };
 
@@ -360,11 +371,9 @@ async function onClose() {
   cfg.sound_enabled = soundToggle.querySelector('.custom-checkbox').getAttribute('aria-checked') === 'true';
   cfg.sound_file = soundSelect.value || null;
   cfg.break_minutes = parseInt(breakSelect.value) || 2;
-  timer.stop();
   storage.saveConfig(cfg);
-  if (particleFrame) cancelAnimationFrame(particleFrame);
   if (appWindow) {
-    try { await appWindow.close(); } catch {}
+    try { await appWindow.hide(); } catch { await appWindow.close(); }
   } else {
     window.close();
   }
@@ -397,9 +406,14 @@ function init() {
     appWindow.setAlwaysOnTop(true).catch(() => {});
   }
 
-  // restore window size if saved
-  if (appWindow && cfg.window_w && cfg.window_h && LogicalSize) {
-    appWindow.setSize(new LogicalSize(cfg.window_w, cfg.window_h)).catch(() => {});
+  // restore window size and position if saved
+  if (appWindow && LogicalSize) {
+    if (cfg.window_w && cfg.window_h) {
+      appWindow.setSize(new LogicalSize(cfg.window_w, cfg.window_h)).catch(() => {});
+    }
+    if (cfg.window_x != null && cfg.window_y != null && LogicalPosition) {
+      appWindow.setPosition(new LogicalPosition(cfg.window_x, cfg.window_y)).catch(() => {});
+    }
   }
 
   // window controls
@@ -477,6 +491,11 @@ function init() {
   updateDisplay();
   animateParticles();
   initSounds();
+  if (notify) {
+    notify.isPermissionGranted().then((granted) => {
+      if (!granted) notify.requestPermission();
+    });
+  }
 }
 
 if (document.readyState === 'loading') {

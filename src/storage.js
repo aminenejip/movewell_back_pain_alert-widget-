@@ -1,6 +1,6 @@
 const CONFIG_KEY = 'pause-dos-config';
 const HISTORY_KEY = 'pause-dos-history';
-const BREAK_PRESETS = [1, 2, 3, 5, 10];
+const BREAK_PRESETS = [1, 2, 3, 5, 10]; // used by break-select in HTML
 
 const DEFAULTS = {
   interval_minutes: 30,
@@ -10,6 +10,8 @@ const DEFAULTS = {
   always_on_top: true,
   window_x: null,
   window_y: null,
+  window_w: null,
+  window_h: null,
 };
 
 export class Storage {
@@ -42,4 +44,3 @@ export class Storage {
 }
 
 export const storage = new Storage();
-export { BREAK_PRESETS };
