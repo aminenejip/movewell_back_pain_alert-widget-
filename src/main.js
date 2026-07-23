@@ -28,6 +28,7 @@ const timeDisplay = $('#time-display');
 const statusDisplay = $('#status-display');
 const ringCanvas = $('#ring-canvas');
 const ctx = ringCanvas.getContext('2d');
+const ringWrapper = $('#ring-wrapper');
 const startBtn = $('#start-btn');
 const pauseBtn = $('#pause-btn');
 const stopBtn = $('#stop-btn');
@@ -44,8 +45,9 @@ const hint = $('#hint');
 const particlesCanvas = $('#particles-canvas');
 const pCtx = particlesCanvas.getContext('2d');
 
-const R = 90;
 const DPR = devicePixelRatio || 1;
+let ringSize = 240;
+let CX = 120, CY = 120, R = 90;
 
 // ── Canvas setup ──
 function setupCanvas(canvas, w, h) {
@@ -58,16 +60,25 @@ function setupCanvas(canvas, w, h) {
   return c;
 }
 
-setupCanvas(ringCanvas, 240, 240);
+function resizeRing() {
+  const size = ringWrapper.clientWidth || 240;
+  ringSize = size;
+  CX = size / 2;
+  CY = size / 2;
+  R = Math.max(20, size / 2 - 12);
+  setupCanvas(ringCanvas, size, size);
+  drawRing();
+}
+
+const ro = new ResizeObserver(resizeRing);
+ro.observe(ringWrapper);
+
 function resizeParticles() {
   const w = document.documentElement.clientWidth;
   const h = document.documentElement.clientHeight;
   setupCanvas(particlesCanvas, w, h);
 }
 resizeParticles();
-
-// ── Drawing ──
-const CX = 120, CY = 120;
 
 function getColor() {
   if (!timer.isRunning() && !timer.isPaused()) return { fg: '#5E6068', dim: '#12141E', txt: '#5E6068', ep: '#5E6068' };
@@ -86,7 +97,7 @@ function drawRing() {
   const col = getColor();
   const pls = timer.isRunning() ? 3 * Math.sin(pulse) : 0;
 
-  c.clearRect(0, 0, 240, 240);
+  c.clearRect(0, 0, ringSize, ringSize);
 
   // bg track
   c.beginPath();
@@ -461,6 +472,7 @@ function init() {
     });
   });
 
+  resizeRing();
   updateHistory();
   updateDisplay();
   animateParticles();
