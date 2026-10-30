@@ -1,0 +1,32 @@
+# Normalize line endings in the repo, checkout native on Windows.
+* text=auto
+
+# Source code files
+*.js text
+*.mjs text
+*.rs text
+*.py text
+*.json text
+*.html text
+*.css text
+*.md text
+*.toml text
+*.yml text
+*.yaml text
+*.spec text
+
+# Windows scripts keep CRLF
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+
+# Binaries — never touch line endings
+*.png binary
+*.jpg binary
+*.webp binary
+*.ico binary
+*.icns binary
+*.mp3 binary
+*.exe binary
+*.msi binary
+*.dll binary
+*.pdb binary
