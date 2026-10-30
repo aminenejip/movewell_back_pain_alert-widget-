@@ -1,20 +1,17 @@
 import { Timer } from './timer.js';
 import { storage } from './storage.js';
 import { audio } from './audio.js';
+import {
+  restoreWindowPlacement,
+  saveWindowPlacement,
+} from './windowPlacement.js';
 
 let appWindow = null;
-let LogicalSize = null;
-let LogicalPosition = null;
 let notify = null;
 try {
   const wmod = await import('@tauri-apps/api/window');
   appWindow = wmod.getCurrentWindow();
 } catch {} // browser fallback
-try {
-  const dpi = await import('@tauri-apps/api/dpi');
-  LogicalSize = dpi.LogicalSize;
-  LogicalPosition = dpi.LogicalPosition;
-} catch {}
 try {
   const nmod = await import('@tauri-apps/plugin-notification');
   notify = nmod;
@@ -359,14 +356,9 @@ function onToggleSound() {
 }
 
 async function onClose() {
-  cfg.window_x = window.screenX;
-  cfg.window_y = window.screenY;
   if (appWindow) {
-    try {
-      const s = await appWindow.outerSize();
-      cfg.window_w = s.width;
-      cfg.window_h = s.height;
-    } catch {}
+    // Physical pixels in — physical pixels out (see windowPlacement.js).
+    await saveWindowPlacement(appWindow, cfg);
   }
   cfg.sound_enabled = soundToggle.querySelector('.custom-checkbox').getAttribute('aria-checked') === 'true';
   cfg.sound_file = soundSelect.value || null;
@@ -394,7 +386,7 @@ if (!appWindow) {
 }
 
 // ── Init ──
-function init() {
+async function init() {
   workSpin.value = cfg.interval_minutes || 30;
   const bm = cfg.break_minutes || 2;
   breakSelect.value = String(bm);
@@ -406,13 +398,14 @@ function init() {
     appWindow.setAlwaysOnTop(true).catch(() => {});
   }
 
-  // restore window size and position if saved
-  if (appWindow && LogicalSize) {
-    if (cfg.window_w && cfg.window_h) {
-      appWindow.setSize(new LogicalSize(cfg.window_w, cfg.window_h)).catch(() => {});
-    }
-    if (cfg.window_x != null && cfg.window_y != null && LogicalPosition) {
-      appWindow.setPosition(new LogicalPosition(cfg.window_x, cfg.window_y)).catch(() => {});
+  // restore window size and position if saved — physical px, monitor-
+  // validated; if the saved placement is off-screen or corrupt it is
+  // repaired here and the corrected values are persisted immediately.
+  if (appWindow) {
+    const repaired = await restoreWindowPlacement(appWindow, cfg);
+    if (repaired) {
+      Object.assign(cfg, repaired);
+      storage.saveConfig(cfg);
     }
   }
 
@@ -499,7 +492,9 @@ function init() {
 }
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
+  document.addEventListener('DOMContentLoaded', () => {
+    init().catch((err) => console.error('[movewell] init failed:', err));
+  });
 } else {
-  init();
+  init().catch((err) => console.error('[movewell] init failed:', err));
 }

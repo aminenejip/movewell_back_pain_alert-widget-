@@ -1,8 +1,9 @@
 [package]
 name = "movewell"
 version = "2.0.0"
-description = "Movewell - Desktop Break Reminder"
-authors = ["you"]
+description = "Movewell - desktop break reminder widget"
+authors = ["Movewell contributors"]
+license = "MIT"
 edition = "2021"
 
 [lib]
