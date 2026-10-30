@@ -1,3 +1,7 @@
+<div align="center">
+
+  <img src="public/movewelle screen.png" alt="movewelle screen" width="500"/>
+
 # Movewell
 
 > A lightweight, always-available desktop widget that reminds you to take care of your back — work / break cycles with a clean animated countdown ring.
@@ -9,6 +13,7 @@
   <img alt="Platform: Windows" src="https://img.shields.io/badge/platform-Windows-0078D6?logo=windows11&logoColor=white">
   <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-green.svg">
 </p>
+</div>
 
 ## What is Movewell?
 
